@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.w3c.dom.Text;
@@ -88,12 +89,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void loginUser(String email, final String password) {
+    private void loginUser(final String email, final String password) {
         mAuth.signInWithEmailAndPassword(email,password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(!task.isSuccessful()){
+                        Toast.makeText(getBaseContext(), "Authentication Failed", Toast.LENGTH_LONG).show();
                         if (password.length() < 6){
                             Snackbar snackBar = Snackbar.make(activity_main,"Password lenght must be over 6", Snackbar.LENGTH_SHORT);
                             snackBar.show();
