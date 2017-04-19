@@ -3,4 +3,13 @@
     <string name="err_msg_name">Enter your full name</string>
     <string name="err_msg_email">Enter valid email address</string>
     <string name="err_msg_password">Enter the password</string>
+
+    <!--Main Activity View -->
+    <string name="mav_emailText">Enter your email</string>
+    <string name="mav_passText">Enter your password</string>
+    <string name="mav_forgotPassText">Forgot Password?</string>
+    <string name="mav_loginText">Log In</string>
+    <string name="mav_orText">OR</string>
+    <string name="mav_signupText">Sign Up</string>
+
 </resources>

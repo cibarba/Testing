@@ -18,8 +18,8 @@
         android:layout_height="wrap_content">
         <EditText
             android:id="@+id/login_email"
-            android:hint="Enter your email"
-            android:inputType="textCapWords"
+            android:hint="@string/mav_emailText"
+            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content">
         <EditText
             android:id="@+id/login_password"
-            android:hint="Enter your password"
+            android:hint="@string/mav_passText"
             android:inputType="textPassword"
             android:maxLines="1"
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
     <Button
         android:layout_below="@+id/login_input_password"
         android:id="@+id/login_btn_login"
-        android:text="Login"
+        android:text="@string/mav_loginText"
         android:background="#263238"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:textStyle="bold"
-        android:text="Forgot Password?"
+        android:text="@string/mav_forgotPassText"
         android:textColor="@color/colorPrimaryDark"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
             android:layout_margin="5dp" />
         <TextView
             android:padding="5dp"
-            android:text="OR"
+            android:text="@string/mav_orText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <View
@@ -85,7 +85,7 @@
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:textStyle="bold"
-        android:text="Sign Up"
+        android:text="@string/mav_signupText"
         android:textColor="@color/colorPrimaryDark"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
