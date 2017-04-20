@@ -71,7 +71,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(!task.isSuccessful()){
-                        snackbar = Snackbar.make(activity_sign_up,"Error: "+ task.getException(),Snackbar.LENGTH_SHORT);
+                        snackbar = Snackbar.make(activity_sign_up,"Error: "+ task.getException(),Snackbar.LENGTH_LONG);
                         snackbar.show();
                     }
                     else{

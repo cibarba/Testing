@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '24.0.2'
     defaultConfig {
         applicationId "com.example.cibarba.testing"
         minSdkVersion 19
@@ -22,7 +22,13 @@ android {
     }
 }
 
+repositories{
+    mavenCentral()
+}
+
 dependencies {
+
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
