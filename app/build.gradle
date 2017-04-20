@@ -21,6 +21,9 @@ android {
         }
     }
 }
+repositories {
+    mavenCentral()
+}
 
 repositories{
     mavenCentral()
@@ -45,7 +48,8 @@ dependencies {
     compile 'com.google.firebase:firebase-core:9.6.1'
     //Firebase Authentication
     compile 'com.google.firebase:firebase-auth:9.6.1'
-
+    //Facebook SDK
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
 }
 
 apply plugin: 'com.google.gms.google-services'
