@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         activity_main = (RelativeLayout) findViewById(R.id.activity_main);
         input_layout_email = (TextInputLayout) findViewById(R.id.login_input_email);
         input_layout_password = (TextInputLayout) findViewById(R.id.login_input_password);
+        btnFacebook = (LoginButton) findViewById(R.id.login_button);
 
         input_email.addTextChangedListener(new MyTextWatcher(input_email));
         input_password.addTextChangedListener(new MyTextWatcher(input_password));
@@ -77,9 +78,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSignUp.setOnClickListener(this);
         btnForgotPassword.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
+        btnFacebook.setOnClickListener(this);
 
         // ...
         mAuth = FirebaseAuth.getInstance();
+
+        //Facebook Sdk
 
         if(mAuth.getCurrentUser() != null){
             startActivity(new Intent(MainActivity.this, DashBoardActivity.class));
