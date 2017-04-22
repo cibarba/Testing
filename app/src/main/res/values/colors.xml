@@ -3,4 +3,24 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <!--Blue -->
+    <color name="blue">#4178BE</color>
+    <!--Red -->
+    <color name="red">#E71D32</color>
+    <!--Grey v1 -->
+    <color name="greyV1">#4A4A4A</color>
+    <!--Grey v2 -->
+    <color name="greyV2">#9B9B9B</color>
+    <!--White v1 -->
+    <color name="whiteV1">#fdfdfd</color>
+    <!--White v2 -->
+    <color name="whiteV2">#fefefe</color>
+    <!--Yellow -->
+    <color name="yellow">#FFCE00</color>
+    <!--Green v1 -->
+    <color name="greenV1">#00B4A0</color>
+    <!--Green v2 -->
+    <color name="greenV2">#5AA700</color>
+    <!--Orange -->
+    <color name="orange">#FF7832</color>
 </resources>

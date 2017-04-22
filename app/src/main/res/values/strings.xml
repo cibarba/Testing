@@ -12,7 +12,7 @@
     <string name="mav_orText">OR</string>
     <string name="mav_signupText">Sign Up</string>
 
-    <!--Facebook Keys-->
+    <!--Facebook sdk -->
     <string name="facebook_app_id">433571743659238</string>
 
 </resources>
