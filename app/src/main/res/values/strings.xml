@@ -10,7 +10,7 @@
     <string name="mav_forgotPassText">Forgot Password?</string>
     <string name="mav_loginText">Log In</string>
     <string name="mav_orText">OR</string>
-    <string name="mav_signupText">Sign Up</string>
+    <string name="mav_signupText">Don\'t have an account? Sign Up</string>
 
     <!--Facebook sdk -->
     <string name="facebook_app_id">433571743659238</string>
