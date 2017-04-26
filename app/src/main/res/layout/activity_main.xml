@@ -11,7 +11,8 @@
         android:layout_centerHorizontal="true"
         android:background="@drawable/icon"
         android:layout_width="128dp"
-        android:layout_height="128dp" />
+        android:layout_height="128dp"
+        android:contentDescription="" />
     <android.support.design.widget.TextInputLayout
         android:layout_below="@+id/icon"
         android:id="@+id/login_input_email"

@@ -46,6 +46,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button btnLogin;
@@ -63,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -79,7 +80,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         input_layout_email = (TextInputLayout) findViewById(R.id.login_input_email);
         input_layout_password = (TextInputLayout) findViewById(R.id.login_input_password);
 
+        mCallbackManager = CallbackManager.Factory.create();
+
         btnFacebook = (LoginButton) findViewById(R.id.login_button);
+        btnFacebook.setReadPermissions(Arrays.asList("email"));
+        btnFacebook.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Snackbar snackbar = Snackbar.make(activity_main, "Se cancelo la operacion", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Snackbar snackbar = Snackbar.make(activity_main, "Hubo algun error en la operacion", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
 
         input_email.addTextChangedListener(new MyTextWatcher(input_email));
         input_password.addTextChangedListener(new MyTextWatcher(input_password));
@@ -90,34 +112,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // ...
 
-        mCallbackManager = CallbackManager.Factory.create();
-        btnFacebook.setReadPermissions("email", "public_profile");
-        btnFacebook.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("", "facebook:onSuccess:" + loginResult);
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
-            @Override
-            public void onCancel() {
-                Log.d("", "facebook:onCancel");
-            }
-            @Override
-            public void onError(FacebookException error) {
-                Log.d("TAG", "facebook:onError", error);
-            }
-        });
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d("", "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d("", "onAuthStateChanged:signed_out");
+                if (user != null){
+                    goDashBoard();
                 }
             }
         };
@@ -126,18 +126,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     //se cierra el onCreate()
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
+    private void goDashBoard() {
+        Intent intent = new Intent(this, DashBoardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override
@@ -159,22 +152,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
-        Log.d("", "handleFacebookAccessToken: " + token);
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d("", "SignInWithCredential:onComplete: " + task.isSuccessful());
-                        if (!task.isSuccessful()) {
-                            Log.w("", "signInWithCredential", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    private void handleFacebookAccessToken(AccessToken accessToken) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (!task.isSuccessful()) {
+                    Snackbar snackbar = Snackbar.make(activity_main, "Firebase error ", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+
+            }
+        });
     }
 
 
@@ -184,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(!task.isSuccessful()){
-                            Snackbar snackbar = Snackbar.make(activity_main, "Authenthication failed", Snackbar.LENGTH_LONG);
+                            Snackbar snackbar = Snackbar.make(activity_main, "Authentication failed", Snackbar.LENGTH_LONG);
                             snackbar.show();
                             if (password.length() < 6){
                                 Snackbar snackBar = Snackbar.make(activity_main,"Password length must be over 6", Snackbar.LENGTH_SHORT);
