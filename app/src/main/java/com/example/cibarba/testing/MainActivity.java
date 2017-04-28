@@ -1,5 +1,6 @@
 package com.example.cibarba.testing;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -35,6 +36,16 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -43,24 +54,30 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     Button btnLogin;
     EditText input_email, input_password;
     TextView btnSignUp, btnForgotPassword;
     TextInputLayout input_layout_email, input_layout_password;
-
     RelativeLayout activity_main;
-
+    //this is for google sign in
+    private static final int RC_SIGN_IN = 9001;
+    private GoogleApiClient mGoogleApiClient;
+    private ProgressDialog mProgressDialog;
+    private SignInButton signInButton;
+    //this is for facebook login
+    private LoginButton btnFacebook;
+    //this is for firebsae
     private FirebaseAuth mAuth;
     private CallbackManager mCallbackManager;
-    private LoginButton btnFacebook;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
@@ -81,7 +98,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         input_layout_password = (TextInputLayout) findViewById(R.id.login_input_password);
 
         mCallbackManager = CallbackManager.Factory.create();
+        //Google signin
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
 
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener(){
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult){
+                        Toast.makeText(MainActivity.this, "Hubo un error", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        signInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                signIn();
+            }
+        });
+
+        //Facebook signin
         btnFacebook = (LoginButton) findViewById(R.id.login_button);
         btnFacebook.setReadPermissions(Arrays.asList("email"));
         btnFacebook.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -118,6 +162,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null){
                     goDashBoard();
+                } else {
+                    // User is signed out
+                    Log.d("", "onAuthStateChanged:signed_out");
                 }
             }
         };
@@ -135,21 +182,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-
-        if (v.getId() == R.id.login_btn_forgot_password){
-            startActivity(new Intent(MainActivity.this , ForgotPassword.class));
-            finish();
+        switch (v.getId()) {
+            case R.id.sign_in_button:
+                signIn();
+                break;
+            case R.id.login_btn_forgot_password:
+                startActivity(new Intent(MainActivity.this, ForgotPassword.class));
+                finish();
+                break;
+            case R.id.login_btn_sign_up:
+                startActivity(new Intent(MainActivity.this, SignUp.class));
+                finish();
+                break;
+            case R.id.login_btn_login:
+                loginUser(input_email.getText().toString(), input_password.getText().toString());
+                break;
         }
-
-        else if (v.getId() == R.id.login_btn_sign_up){
-            startActivity(new Intent(MainActivity.this , SignUp.class));
-            finish();
-        }
-
-        else if (v.getId() == R.id.login_btn_login){
-            loginUser(input_email.getText().toString(), input_password.getText().toString());
-        }
-
     }
 
     @Override
@@ -158,12 +206,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth.addAuthStateListener(mAuthListener);
     }
 
+
     @Override
-    public void onStop() {
+    public void onStop () {
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+    // [START signIn]
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+    // [END signIn]
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d("", "onConnectionFailed:" + connectionResult);
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
     }
 
     private void handleFacebookAccessToken(AccessToken accessToken) {
@@ -180,33 +252,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-
     private void loginUser(final String email, final String password) {
-        mAuth.signInWithEmailAndPassword(email,password)
+        mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()){
+                        if (!task.isSuccessful()) {
                             Snackbar snackbar = Snackbar.make(activity_main, "Authentication failed", Snackbar.LENGTH_LONG);
                             snackbar.show();
-                            if (password.length() < 6){
-                                Snackbar snackBar = Snackbar.make(activity_main,"Password length must be over 6", Snackbar.LENGTH_SHORT);
+                            if (password.length() < 6) {
+                                Snackbar snackBar = Snackbar.make(activity_main, "Password length must be over 6", Snackbar.LENGTH_SHORT);
                                 snackBar.show();
                             }
-                        }
-                        else{
+                        } else {
                             startActivity(new Intent(MainActivity.this, DashBoardActivity.class));
                         }
                     }
                 });
     }
 
-    private void submitForm(){
-        if (!validateEmail()){
+    private void submitForm() {
+        if (!validateEmail()) {
             return;
         }
 
-        if (!validatePass()){
+        if (!validatePass()) {
             return;
         }
         Toast.makeText(getApplicationContext(), "Thank you", Toast.LENGTH_SHORT);
@@ -226,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
 
     }
+
     //Validate Password boolean
     private boolean validatePass() {
         if (input_password.getText().toString().trim().isEmpty()) {
@@ -257,15 +328,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             this.v = v;
         }
 
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2){
-
-        }
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2){
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
         }
 
-        public void afterTextChanged(Editable editable){
-            switch (v.getId()){
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (v.getId()) {
                 case R.id.login_email:
                     validateEmail();
                     break;
@@ -277,11 +349,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+    //this is for sending the information to firebase
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d("", "firebaseAuthWithGoogle:" + acct.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d("", "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w("", "signInWithCredential", task.getException());
+                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        // ...
+                    }
+                });
+    }
+
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()){
+                GoogleSignInAccount acct = result.getSignInAccount();
+                firebaseAuthWithGoogle(acct);
+            } else {
 
+            }
+        }
     }
-
 }

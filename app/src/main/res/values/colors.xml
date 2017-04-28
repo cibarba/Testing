@@ -23,4 +23,6 @@
     <color name="greenV2">#5AA700</color>
     <!--Orange -->
     <color name="orange">#FF7832</color>
+    <!--Blue grey 500 -->
+    <color name="blue_grey_500">#607D8B</color>
 </resources>

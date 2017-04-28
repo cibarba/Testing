@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:padding="16dp"
     android:layout_height="wrap_content"
@@ -42,7 +43,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
-
     <TextView
         android:layout_below="@+id/login_input_password"
         android:id="@+id/login_btn_sign_up"
