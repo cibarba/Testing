@@ -9,12 +9,13 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:background="@drawable/icon"
         android:layout_width="128dp"
         android:layout_height="128dp"
-        android:contentDescription="" />
+        android:contentDescription=""
+        android:layout_marginTop="57dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
     <android.support.design.widget.TextInputLayout
         android:layout_below="@+id/icon"
         android:id="@+id/login_input_email"
@@ -70,18 +71,18 @@
         android:layout_marginTop="11dp"
         android:layout_centerHorizontal="true"/>
     <Button
-        android:layout_below="@+id/sign_in_button"
         android:id="@+id/login_btn_login"
         android:text="@string/mav_loginText"
         android:background="@drawable/button_border_login"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAllCaps= "false"/>
+        android:textAllCaps= "false"
+        android:layout_marginTop="12dp"
+        android:layout_below="@+id/sign_in_button"
+        android:layout_alignParentStart="true" />
     <TextView
-        android:layout_below="@+id/login_btn_login"
         android:id="@+id/login_btn_forgot_password"
-        android:layout_centerHorizontal="true"
         android:clickable="true"
         android:textStyle="bold"
         android:text="@string/mav_forgotPassText"
@@ -89,5 +90,7 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAllCaps= "false"/>
+        android:textAllCaps= "false"
+        android:layout_below="@+id/login_btn_login"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
