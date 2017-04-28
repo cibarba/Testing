@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +27,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     private RelativeLayout activity_dashboard;
 
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +42,37 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         activity_dashboard = (RelativeLayout) findViewById(R.id.activity_dashboard);
 
         btnChangePass.setOnClickListener(this);
-        btnLogOut.setOnClickListener(this);
+        //This is for Facebook and Google log out
+        btnLogOut.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                LoginManager.getInstance().logOut();
+                mAuth.signOut();
+            }
+        });
 
         //Init Firebase
         mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null){
+                    startActivity(new Intent(DashBoardActivity.this, MainActivity.class));
+                }
+            }
+        };
 
         //Session check
         if(mAuth.getCurrentUser() != null){
             txtWelcome.setText("Welcome, " + mAuth.getCurrentUser().getEmail());
         }
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
